@@ -1,14 +1,14 @@
 import { Sequelize } from "sequelize-typescript"
-import OrderModel from "../../repository/order.model"
-import OrderItemModel from "../../repository/order-item.model"
-import { ClientModel } from "../../../client-adm/repository/client.model"
-import ProductModel from "../../../store-catalog/repository/product.model"
-import Address from "../../../@shared/domain/value-object/address"
-import Client from "../../domain/client.entity"
-import Id from "../../../@shared/domain/value-object/id.value-object"
-import Product from "../../domain/product.entity"
+import OrderModel from "./order.model"
+import OrderItemModel from "./order-item.model"
+import { ClientModel } from "../../client-adm/repository/client.model"
+import ProductModel from "../../store-catalog/repository/product.model"
+import Address from "../../@shared/domain/value-object/address"
+import Client from "../domain/client.entity"
+import Id from "../../@shared/domain/value-object/id.value-object"
+import Product from "../domain/product.entity"
 import CheckoutRepository from "./checkout.repository"
-import Order from "../../domain/order.entity"
+import Order from "../domain/order.entity"
 
 describe("Checkout Repository", () => {
   let sequelize: Sequelize

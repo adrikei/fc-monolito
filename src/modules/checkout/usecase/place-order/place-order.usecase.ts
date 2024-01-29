@@ -33,37 +33,41 @@ export default class PlaceOrderUseCase implements UseCaseInterface {
       throw new Error("Client not found");
     }
 
-    await this.validateProducts(input);
+    try{
+      await this.validateProducts(input);
 
-    const products = await Promise.all(
-      input.products.map((p) => {
-        return this.getProduct(p.productId);
-      })
-    );
+      const products = await Promise.all(
+        input.products.map((p) => {
+          return this.getProduct(p.productId);
+        })
+      );
 
-    const myClient = new Client({
-      id: new Id(client.id),
-      name: client.name,
-      email: client.email,
-      address: client.address,
-    });
+      const myClient = new Client({
+        id: new Id(client.id),
+        name: client.name,
+        email: client.email,
+        address: client.address,
+      });
 
-    const order = new Order({
-      client: myClient,
-      products: products,
-    });
-    this._repository.addOrder(order);
+      const order = new Order({
+        client: myClient,
+        products: products,
+      });
+      this._repository.addOrder(order);
 
-    return {
-      id: order.id.id,
-      total: order.total,
-      products: order.products.map((p) => {
-        return {
-          productId: p.id.id,
-          salesPrice: p.salesPrice,
-        };
-      }),
-    };
+      return {
+        id: order.id.id,
+        total: order.total,
+        products: order.products.map((p) => {
+          return {
+            productId: p.id.id,
+            salesPrice: p.salesPrice,
+          };
+        }),
+      };
+    } catch (error) {
+      console.log("<<<<<<<<", error)
+    }
   }
 
   private async validateProducts(input: PlaceOrderInputDto) {

@@ -1,11 +1,11 @@
-import Address from "../../../@shared/domain/value-object/address";
-import Id from "../../../@shared/domain/value-object/id.value-object";
-import Client from "../../domain/client.entity";
-import Order from "../../domain/order.entity";
-import Product from "../../domain/product.entity";
-import CheckoutGateway from "../../gateway/checkout.gateway";
-import OrderItemModel from "../../repository/order-item.model";
-import OrderModel from "../../repository/order.model";
+import Address from "../../@shared/domain/value-object/address";
+import Id from "../../@shared/domain/value-object/id.value-object";
+import Client from "../domain/client.entity";
+import Order from "../domain/order.entity";
+import Product from "../domain/product.entity";
+import CheckoutGateway from "../gateway/checkout.gateway";
+import OrderItemModel from "./order-item.model";
+import OrderModel from "./order.model";
 
 export default class CheckoutRepository implements CheckoutGateway {
   
