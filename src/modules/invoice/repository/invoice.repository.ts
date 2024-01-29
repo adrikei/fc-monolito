@@ -1,5 +1,4 @@
 import Address from '../../@shared/domain/value-object/address'
-import Id from '../../@shared/domain/value-object/id.value-object'
 import InvoiceItem from '../domain/invoice-item.entity'
 import Invoice from '../domain/invoice.entity'
 import InvoiceGateway from '../gateway/invoice.gateway'
@@ -21,8 +20,6 @@ export default class InvoiceRepository implements InvoiceGateway {
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-
-    console.log(">>>>>>>>>>", invoiceModel.id, invoiceModel)
 
     for (const item of invoice.items) {
       await InvoiceItemModel.create({

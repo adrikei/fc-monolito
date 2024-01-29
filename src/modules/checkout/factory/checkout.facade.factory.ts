@@ -1,5 +1,6 @@
 
 import ClientAdmFacadeFactory from "../../client-adm/factory/client-adm.facade.factory";
+import InvoiceFacadeFactory from "../../invoice/factory/invoce.facade.factory";
 import ProductAdmFacadeFactory from "../../product-adm/factory/facade.factory";
 import StoreCatalogFacadeFactory from "../../store-catalog/factory/facade.factory";
 import CheckoutFacade from "../facade/checkout.facade";
@@ -14,8 +15,9 @@ export default class CheckoutFacadeFactory {
     let productAdm = ProductAdmFacadeFactory.create()
     let catalog = StoreCatalogFacadeFactory.create()
     let repo = new CheckoutRepository();
+    let invoice = InvoiceFacadeFactory.create()
 
-    let placeOrder = new PlaceOrderUseCase(clientAdm, productAdm, catalog, repo)
+    let placeOrder = new PlaceOrderUseCase(clientAdm, productAdm, catalog, repo, invoice)
 
 
     return new CheckoutFacade(placeOrder);

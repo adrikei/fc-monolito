@@ -49,7 +49,7 @@ describe("ProductRepository test", () => {
   it("should find a product", async () => {
     const productRepository = new ProductRepository();
 
-    ProductModel.create({
+    await ProductModel.create({
       id: "1",
       name: "Product 1",
       description: "Product 1 description",

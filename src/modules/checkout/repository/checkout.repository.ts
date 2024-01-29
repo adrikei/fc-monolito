@@ -10,7 +10,6 @@ import OrderModel from "./order.model";
 export default class CheckoutRepository implements CheckoutGateway {
   
   async addOrder(order: Order): Promise<void> {
-    try{ 
 
       const createdOrder = await OrderModel.create({
         id: order.id.id,
@@ -24,9 +23,6 @@ export default class CheckoutRepository implements CheckoutGateway {
           price: item.salesPrice
         })
       }
-    } catch (error) {
-      console.log(error)
-    }
   }
   async findOrder(id: string): Promise<Order> {
     const order = await OrderModel.findByPk(id, {

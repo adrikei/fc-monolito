@@ -10,7 +10,7 @@ export default class CheckoutFacade implements CheckoutFacadeInterface {
     const order = await this.placeOrderUseCase.execute(input);
     return {
       id: order.id,
-      invoiceId: order.id,
+      invoiceId: order.invoiceId,
       total: order.total
     }
   }

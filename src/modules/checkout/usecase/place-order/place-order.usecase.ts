@@ -1,6 +1,7 @@
 import Id from "../../../@shared/domain/value-object/id.value-object";
 import UseCaseInterface from "../../../@shared/usecase/use-case.interface";
 import ClientAdmFacadeInterface from "../../../client-adm/facade/client-adm.facade.interface";
+import InvoiceFacadeInterface from "../../../invoice/facade/invoice.facade.interface";
 import ProductAdmFacadeInterface from "../../../product-adm/facade/product-adm.facade.interface";
 import StoreCatalogFacade from "../../../store-catalog/facade/store-catalog.facade";
 import Client from "../../domain/client.entity";
@@ -14,17 +15,20 @@ export default class PlaceOrderUseCase implements UseCaseInterface {
   private _productFacade: ProductAdmFacadeInterface;
   private _catalogFacade: StoreCatalogFacade;
   private _repository: CheckoutGateway;
+  private _invoice: InvoiceFacadeInterface
 
   constructor(
     clientFacade: ClientAdmFacadeInterface,
     productFacade: ProductAdmFacadeInterface,
     catalogFacade: StoreCatalogFacade,
-    repository: CheckoutGateway
+    repository: CheckoutGateway,
+    invoiceFacade: InvoiceFacadeInterface
   ) {
     this._clientFacade = clientFacade;
     this._productFacade = productFacade;
     this._catalogFacade = catalogFacade;
     this._repository = repository;
+    this._invoice = invoiceFacade
   }
 
   async execute(input: PlaceOrderInputDto): Promise<PlaceOrderOutputDto> {
@@ -33,41 +37,61 @@ export default class PlaceOrderUseCase implements UseCaseInterface {
       throw new Error("Client not found");
     }
 
-    try{
-      await this.validateProducts(input);
+    await this.validateProducts(input);
 
-      const products = await Promise.all(
-        input.products.map((p) => {
-          return this.getProduct(p.productId);
-        })
-      );
+    const dbProducts = await Promise.all(
+      input.products.map(async (p) => this.getProduct(p.productId))
+    );
 
-      const myClient = new Client({
-        id: new Id(client.id),
-        name: client.name,
-        email: client.email,
-        address: client.address,
-      });
+    const myClient = new Client({
+      id: new Id(client.id),
+      name: client.name,
+      email: client.email,
+      address: client.address,
+    });
 
-      const order = new Order({
-        client: myClient,
-        products: products,
-      });
-      this._repository.addOrder(order);
+    const products = dbProducts.map(p => (
+      new Product({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        salesPrice: input.products.filter(prod => prod.productId === p.id.id)[0].salesPrice
+      }))
+    )
 
-      return {
-        id: order.id.id,
-        total: order.total,
-        products: order.products.map((p) => {
-          return {
-            productId: p.id.id,
-            salesPrice: p.salesPrice,
-          };
-        }),
-      };
-    } catch (error) {
-      console.log("<<<<<<<<", error)
-    }
+    const order = new Order({
+      client: myClient,
+      products: products,
+    });
+    await this._repository.addOrder(order);
+
+    const invoice = await this._invoice.generateInvoice({
+      name: client.name,
+      document: client.document,
+      street: client.address.street,
+      number: client.address.number,
+      complement: client.address.complement,
+      city: client.address.city,
+      state: client.address.state,
+      zipCode: client.address.zipCode,
+      items: order.products.map(p => ({
+        id: p.id.id,
+        name: p.name,
+        price: p.salesPrice
+      }))
+    })
+
+    return {
+      id: order.id.id,
+      invoiceId: invoice.id,
+      total: order.total,
+      products: order.products.map((p) => {
+        return {
+          productId: p.id.id,
+          salesPrice: p.salesPrice
+        };
+      }),
+    };
   }
 
   private async validateProducts(input: PlaceOrderInputDto) {
